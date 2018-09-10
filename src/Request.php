@@ -26,6 +26,26 @@ class Request
      */
     protected $uri;
 
+    /**
+     * The request path.
+     *
+     * @var string
+     */
+    protected $uriPath;
+
+    /**
+     * The query string.
+     *
+     * @var string
+     */
+    protected $query;
+
+    /**
+     * The query string parameters.
+     *
+     * @var array
+     */
+    protected $queryParameters = array();
 
     /**
      * Associative headers array.
@@ -34,12 +54,14 @@ class Request
      */
     protected $headers = array();
 
-    public function __construct(string $method, string $uri, array $headers, string $protocol = "HTTP/1.1")
+    public function __construct(string $method, string $uriPath, array $headers, string $protocol = "HTTP/1.1")
     {
         $this->method = $method;
         $this->headers = $headers;
         $this->protocol = $protocol;
-        $this->uri = $uri;
+        $this->uriPath = $uriPath;
+
+        $this->parseUriPath();
     }
 
     /**
@@ -52,11 +74,11 @@ class Request
 
         $methodHttpVersionString = array_shift($headers);
 
-        list($method, $uri, $protocol) = array_map('trim', explode(" ", $methodHttpVersionString));
+        list($method, $uriPath, $protocol) = array_map('trim', explode(" ", $methodHttpVersionString));
 
         $headers = self::parseHeadersToAssoc($headers);
 
-        return new self($method, $uri, $headers, $protocol);
+        return new self($method, $uriPath, $headers, $protocol);
     }
 
     /**
@@ -82,4 +104,44 @@ class Request
         return $headersAssoc;
     }
 
+    /**
+     *
+     */
+    private function parseUriPath()
+    {
+        $cutUriPath = explode("?", $this->uriPath, 2);
+
+        $this->query = isset($cutUriPath[1]) ? $cutUriPath[1] : '';
+
+        $this->parseQueryParameters();
+    }
+
+    /**
+     * Parses the query string parameters
+     * to associative array.
+     */
+    private function parseQueryParameters()
+    {
+        $parameters = explode("&", $this->query);
+
+        foreach ($parameters as $parameter) {
+
+            if ( ! empty($parameter)) {
+
+                $parameter = explode("=", $parameter, 2);
+
+                array_push($this->queryParameters, [
+                    $parameter[0] => isset($parameter[1]) ? $parameter[1] : ""
+                ]);
+            }
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getUriPath() : string
+    {
+        return $this->uriPath;
+    }
 }

@@ -45,7 +45,6 @@ class Server
 
     public function listenAndServe()
     {
-
         while ( true ) {
             socket_listen($this->socket);
 
@@ -61,6 +60,8 @@ class Server
             $requestHeaders = socket_read($client, 1024);
 
             $request = Request::makeFromHeaderString($requestHeaders);
+
+            socket_write($client, "HTTP/1.1 200 OK");
 
             socket_close($client);
         }
