@@ -144,4 +144,12 @@ class Request
     {
         return $this->uriPath;
     }
+
+    /**
+     * @return string
+     */
+    public function getMethod() : string
+    {
+        return $this->method;
+    }
 }

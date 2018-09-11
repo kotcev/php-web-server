@@ -13,7 +13,12 @@ class Server
 
     private $port;
 
-    private $handlers;
+    /**
+     * Concurrent clients.
+     *
+     * @var array
+     */
+    private $clients = array();
 
     /**
      * Server constructor.
@@ -43,12 +48,15 @@ class Server
         }
     }
 
+    /**
+     * The loop.
+     */
     public function listenAndServe()
     {
         while ( true ) {
             socket_listen($this->socket);
 
-            // if client connects to the server move on,
+            // If client connects to the server move on,
             // else skip this cycle.
             if ( ! $client = socket_accept($this->socket)) {
                 socket_close($client);
@@ -61,13 +69,14 @@ class Server
 
             $request = Request::makeFromHeaderString($requestHeaders);
 
-            socket_write($client, "HTTP/1.1 200 OK");
+            // Every new client is served by its own thread.
+            array_push(
+                $this->clients,
+                new ClientThread($client, $request)
+            );
 
-            socket_close($client);
+            print (string) count($this->clients);
         }
-
     }
-
-
 
 }
