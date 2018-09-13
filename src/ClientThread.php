@@ -20,10 +20,18 @@ class ClientThread extends \Thread
      */
     protected $request;
 
-    public function __construct($socket, Request $request)
+    /**
+     * The web response;
+     *
+     * @var Response
+     */
+    protected $response;
+
+    public function __construct($socket, Request $request, Response $response)
     {
         $this->socket = $socket;
         $this->request = $request;
+        $this->response = $response;
 
         $this->start();
     }
@@ -33,7 +41,7 @@ class ClientThread extends \Thread
      */
     public function run()
     {
-        socket_write($this->socket, "HTTP/1.1 200 OK" . "\r\n\r\n" . (string) microtime(true));
+        socket_write($this->socket, $this->response->getResponseString());
 
         socket_close($this->socket);
     }
