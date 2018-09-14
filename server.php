@@ -15,7 +15,7 @@ $handlerCollection->registerHandler('/', function() {
 });
 
 $handlerCollection->registerHandler('/about-us', function() {
-    return 'contacts';
+    return 'about-us';
 });
 
 $handlerCollection->registerHandler('/contacts', function() {
