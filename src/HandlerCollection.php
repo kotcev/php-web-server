@@ -24,6 +24,8 @@ class HandlerCollection
      * @param $uriPath
      * @param callable $handler
      */
+
+    // TODO figure out the Trailing slashes
     public function registerHandler($uriPath, callable $handler) : void
     {
         $this->handlers[$uriPath] = $handler;
@@ -35,7 +37,7 @@ class HandlerCollection
      */
     public function callHandler($uriPath)
     {
-        if (! isset($this->handlers[$uriPath])) {
+        if ( ! isset($this->handlers[$uriPath])) {
             return new Response("404 Not found!", 404);
         }
 

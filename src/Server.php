@@ -14,8 +14,11 @@ class Server
     private $port;
 
     /**
-     * Concurrent clients.
-     *
+     * @var HandlerCollection
+     */
+    private $handlerCollection;
+
+    /**
      * @var array
      */
     private $clients = array();
@@ -24,12 +27,14 @@ class Server
      * Server constructor.
      * @param string $host
      * @param int $port
+     * @param HandlerCollection $handlerCollection
      * @throws Exception
      */
-    public function __construct(string $host, int $port)
+    public function __construct(string $host, int $port, HandlerCollection $handlerCollection = null)
     {
         $this->host = $host;
         $this->port = $port;
+        $this->handlerCollection = $handlerCollection;
 
         $this->socketSetup();
     }
@@ -66,17 +71,25 @@ class Server
             }
 
             $requestHeaders = socket_read($client, 1024);
-
             $request = Request::makeFromHeaderString($requestHeaders);
 
+            $dispatcher = new HandlerDispatcher($this->handlerCollection, $request);
+            $response = $dispatcher->dispatch();
 
-//
-//            // Every new client is served by its own thread.
-//            array_push(
-//                $this->clients,
-//                new ClientThread($client, $request, $response)
-//            );
+            // Every new client is served by its own thread.
+            array_push(
+                $this->clients,
+                new ClientThread($client, $request, $response)
+            );
         }
+    }
+
+    /**
+     * @param HandlerCollection $handlerCollection
+     */
+    public function setHandlerCollection(HandlerCollection $handlerCollection) : void
+    {
+        $this->handlerCollection = $handlerCollection;
     }
 
 }

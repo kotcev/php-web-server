@@ -8,4 +8,19 @@ try {
     die($e->getMessage());
 }
 
+$handlerCollection = new \Kotcev\Server\HandlerCollection();
+
+$handlerCollection->registerHandler('/', function() {
+    return 'home';
+});
+
+$handlerCollection->registerHandler('/about-us', function() {
+    return 'contacts';
+});
+
+$handlerCollection->registerHandler('/contacts', function() {
+    return 'contacts';
+});
+
+$server->setHandlerCollection($handlerCollection);
 $server->listenAndServe();

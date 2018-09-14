@@ -28,11 +28,11 @@ class HandlerDispatcher
     }
 
     /**
-     *
+     * @return Response
      */
-    public function dispatch()
+    public function dispatch() : Response
     {
-        $this->handlerCollection->callHandler($this->request->getUriPath());
+        return $this->handlerCollection->callHandler($this->request->getUriPath());
     }
 
 }
