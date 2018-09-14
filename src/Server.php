@@ -69,15 +69,13 @@ class Server
 
             $request = Request::makeFromHeaderString($requestHeaders);
 
-            $response = new Response('hello world');
 
-            // Every new client is served by its own thread.
-            array_push(
-                $this->clients,
-                new ClientThread($client, $request, $response)
-            );
-
-            print (string) count($this->clients);
+//
+//            // Every new client is served by its own thread.
+//            array_push(
+//                $this->clients,
+//                new ClientThread($client, $request, $response)
+//            );
         }
     }
 
