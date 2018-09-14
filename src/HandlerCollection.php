@@ -39,7 +39,13 @@ class HandlerCollection
             return new Response("404 Not found!", 404);
         }
 
-        return new Response((string) $this->handlers[$uriPath](), 200);
+        $handlerReturnValue = $this->handlers[$uriPath]();
+
+        if ($handlerReturnValue instanceof Response) {
+            return $handlerReturnValue;
+        }
+
+        return new Response((string) $handlerReturnValue, 200);
     }
 
     /**
