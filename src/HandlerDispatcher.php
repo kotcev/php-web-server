@@ -32,7 +32,7 @@ class HandlerDispatcher
      */
     public function dispatch() : Response
     {
-        return $this->handlerCollection->callHandler($this->request->getUriPath());
+        return $this->handlerCollection->callHandler($this->request->getUriPath(), $this->request);
     }
 
 }

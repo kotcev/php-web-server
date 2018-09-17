@@ -24,30 +24,42 @@ class HandlerCollection
      * @param $uriPath
      * @param callable $handler
      */
-
-    // TODO figure out the Trailing slashes
     public function registerHandler($uriPath, callable $handler) : void
     {
+        $uriPath = $this->addTrailingSlash($uriPath);
+
         $this->handlers[$uriPath] = $handler;
     }
 
     /**
      * @param $uriPath
+     * @param Request $request
      * @return Response
      */
-    public function callHandler($uriPath)
+    public function callHandler($uriPath, Request $request)
     {
+        $uriPath = $this->addTrailingSlash($uriPath);
+
         if ( ! isset($this->handlers[$uriPath])) {
             return new Response("404 Not found!", 404);
         }
 
-        $handlerReturnValue = $this->handlers[$uriPath]();
+        $handlerReturnValue = $this->handlers[$uriPath]($request);
 
         if ($handlerReturnValue instanceof Response) {
             return $handlerReturnValue;
         }
 
         return new Response((string) $handlerReturnValue, 200);
+    }
+
+    /**
+     * @param $uriPath
+     * @return string
+     */
+    private function addTrailingSlash($uriPath)
+    {
+        return $uriPath{-1} !== '/' ? $uriPath . '/' : $uriPath;
     }
 
     /**
