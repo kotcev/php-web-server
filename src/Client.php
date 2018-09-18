@@ -3,7 +3,7 @@
 namespace Kotcev\Server;
 
 
-class ClientThread extends \Thread
+class Client
 {
 
     /**
@@ -32,20 +32,16 @@ class ClientThread extends \Thread
         $this->socket = $socket;
         $this->request = $request;
         $this->response = $response;
-
-        $this->start();
     }
 
     /**
      *
      */
-    public function run()
+    public function serve()
     {
         socket_write($this->socket, $this->response->getResponseString());
 
         socket_close($this->socket);
-
-        $this->join();
     }
 
 }

@@ -3,7 +3,7 @@
 require "vendor/autoload.php";
 
 try {
-    $server = new \Kotcev\Server\Server("127.0.0.1", 1234);
+    $server = new \Kotcev\Server\Server("127.0.0.1", 8080);
 } catch (Exception $e) {
     die($e->getMessage());
 }
@@ -30,4 +30,5 @@ $handlerCollection->registerHandler('/contacts', function($request) {
  * Run the server.
  */
 $server->setHandlerCollection($handlerCollection);
+$server->setBlocking(true);
 $server->listenAndServe();

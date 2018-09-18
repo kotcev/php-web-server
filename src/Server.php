@@ -14,6 +14,14 @@ class Server
     private $port;
 
     /**
+     * If this is set to false the server will
+     * not run in threaded environment.
+     *
+     * @var bool
+     */
+    private $blocking = false;
+
+    /**
      * @var HandlerCollection
      */
     private $handlerCollection;
@@ -70,17 +78,23 @@ class Server
                 continue;
             }
 
-            $requestHeaders = socket_read($client, 1024);
+            $requestHeaders = socket_read($client, 1024, PHP_BINARY_READ);
             $request = Request::makeFromHeaderString($requestHeaders);
 
             $dispatcher = new HandlerDispatcher($this->handlerCollection, $request);
             $response = $dispatcher->dispatch();
 
-            // Every new client is served by its own thread.
-            array_push(
-                $this->clients,
-                new ClientThread($client, $request, $response)
-            );
+            if ( ! $this->blocking) {
+                // Every new client is served by its own thread.
+                array_push(
+                    $this->clients,
+                    new ClientThread($client, $request, $response)
+                );
+            } else {
+                $client = new Client($client, $request, $response);
+                $client->serve();
+            }
+
         }
     }
 
@@ -90,6 +104,14 @@ class Server
     public function setHandlerCollection(HandlerCollection $handlerCollection) : void
     {
         $this->handlerCollection = $handlerCollection;
+    }
+
+    /**
+     * @param bool $state
+     */
+    public function setBlocking(bool $state) : void
+    {
+        $this->blocking = $state;
     }
 
 }
